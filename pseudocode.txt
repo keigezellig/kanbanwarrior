@@ -1,0 +1,266 @@
+Commands
+--------
+kanban-warrior addtobacklog <projectname.storyname> <task> <priority>
+kanban-warrior addtowip <taskid>
+kanban-warrior start <taskid>
+kanban-warrior stop <taskid>
+kanban-warrior hold <taskid> <reason>
+kanban-warrior finish <taskid>
+(kanban-warrior deletetasks <projectname>)
+
+Reports
+-------
+kanban-warrior list <projectname> backlog => task project:projectname long +backlog
+kanban-warriot list <projectname> wip => task project:projectname long +inprogress
+kanban-warrior list <projectname> done => task project:projectname completed
+kanban-warrior list <projectname> onhold => task long project:projectname +onhold
+
+
+Command parser
+==============
+<command>       <parameters>
+addtobacklog	<projectname.[storyname] <task> [priority] 
+						  H,M,L	  	 
+addtowip        <taskid> 
+start           <taskid>
+stop		<taskid>
+hold		<taskid> <reason>
+finish		<taskid>
+list		<projectname> <subcommand>
+			       backlog,wip,done,onhold
+
+
+commanditems = commandline.split(' ')
+command = commandItems[0]
+Commands[command].Execute(commanditems);
+
+AddToBacklogCommand.Execute(commandItems)
+{
+   project = commandItems[1]
+   taskname = commandItems[2]
+   prio = commandItems[3] == [H,M,L] ? commandItems[3] : crash("invalid prio")
+   exec("task add project:<project> priority:<prio> taskname")
+   taskid = task id from command output
+   task = new Task(taskid, states.Backlog)
+   
+   tasklist.add(task)
+   tasklist.writeToDisk();
+}
+
+AddToWipCommand.Execute(commandItems)
+{
+   tasklist.readFromDisk()
+   id = commandItems[1]
+   task = tasklist.gettask(id)
+   if (task == null)
+     crash("task doesn't exist")
+
+   statemachine.AddToWip(task)
+}
+
+StartCommand.Execute(commandItems)
+{
+   tasklist.readFromDisk()
+   id = commandItems[1]
+   task = tasklist.gettask(id)
+   if (task == null)
+     crash("task doesn't exist")
+
+   statemachine.Start(task)
+}
+
+StopCommand.Execute(commandItems)
+{
+   tasklist.readFromDisk()
+   id = commandItems[1]
+   task = tasklist.gettask(id)
+   if (task == null)
+     crash("task doesn't exist")
+
+   statemachine.Stop(task)
+}
+
+HoldCommand.Execute(commandItems)
+{
+   tasklist.readFromDisk()
+   id = commandItems[1]
+   reason = commandItems[2]
+   task = tasklist.gettask(id)
+   if (task == null)
+     crash("task doesn't exist")
+
+   statemachine.Hold(task)
+}
+
+FinishCommand.Execute(commandItems)
+{
+   tasklist.readFromDisk()
+   id = commandItems[1]
+   task = tasklist.gettask(id)
+   if (task == null)
+     crash("task doesn't exist")
+
+   statemachine.Finish(task)
+}
+
+ListCommand.Execute(commandItems)
+{
+   projectname = commandItems[1]
+   subcommand = commandItems[2]
+   subcommands[subcommand].Execute(projectname)
+}
+
+ListBacklogCommand.Execute(commandItems)
+{
+  exec("task project:<commandItems[0]> long +backlog")
+}
+
+ListInprogessCommand.Execute(commandItems)
+{
+  exec("task project:<commandItems[0]> long +inprogress")
+}
+
+ListOnHoldCommand.Execute(commandItems)
+{
+  exec("task project:<commandItems[0]> long +onhold")
+}
+
+ListDoneCommand.Execute(commandItems)
+{
+  exec("task project:<commandItems[0]> completed")
+}
+
+
+
+
+
+State machien
+==============
+States:
+--------
+Backlog 
+InProgress 
+  Active
+  Inactive
+Done
+OnHold
+
+   B Ia Ii D H
+B  - x  x  - -
+Ia - -  x  x x
+Ii - x  -  x x   
+D  - -  -  - -
+H  - x  x  - -
+
+B -> Ia (Start): 	    AddTaskToWIP, StaartTask
+B -> Ii: (AddToWIP):        AddTaskToWIP
+Ia -> Ii: (Stop):	    StopTask
+Ia -> D: (Finish):	    FinishTask
+Ia -> H: (Hold):	    HoldTask
+Ii -> H: (Hold):	    HoldTask
+Ii -> Ia: (Start): 	    StartTask
+Ii -> D: (Finish):	    FinishTask
+H -> Ia: (Start)            AddTaskToWIP, StartTask	
+H -> Ii: (AddToWIP)	    AddTaskToWIP
+
+
+AddToWip(task)
+{
+  if (task.state != B && task.state != H)
+  {
+     crash("Illegal state")
+  }
+
+  AddTaskToWip(task)
+  task.state = Ii
+}
+
+Start(task)
+{
+   if (task.state != B && task.state != H && task.state != Ii)
+   {
+	crash("Illegal state")
+   }
+
+   if (task.state == Ii)
+   {
+       StartTask(task)
+   }
+   else
+   {
+     AddTaskToWip(task)
+     StartTask(task)
+   }
+
+   task.state = Ia
+
+}
+
+Stop(task)
+{
+  if (task.state != Ia)
+  {
+     crash("Illegal state")
+  }
+  
+  StopTask(task)
+  task.state = Ii
+}
+
+Finish(task)
+{
+   if (task.state != Ia) && (task.state != Ii)
+   {
+     crash("Illegal state")
+   }
+
+   FinishTask(task)
+   task.state = D
+
+}
+
+Hold(task)
+{
+   if (task.state != Ia) && (task.state != Ii)
+   {
+     crash("Illegal state")
+   }
+
+   HoldTask(task)
+   task.state = H
+
+}
+
+
+
+AddTaskToWip(task)
+if (task.state == B)
+{
+  task task.taskid modify -backlog +inprogress 
+}
+else
+{
+  task taskid modify -onhold +inprogress
+}
+  
+  
+StartTask(task)
+{
+  task task.id start
+}
+
+StopTask(task)
+{
+  task task.id stop
+}
+
+FinishTask(task)
+{
+  task task.id done
+}
+
+HoldTask(task, reason)
+{
+  task task.id modify -inprogress +onhold
+  task task.id annotate reason 
+}
