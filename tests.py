@@ -1,8 +1,3 @@
-#import sys
-#sys.path.append('home/maarten/git/kanbanwarrior/app/')
-#sys.path.append('home/maarten/git/kanbanwarrior/')
-#print sys.path
-
 
 from app.administration.statemachine import *
 
