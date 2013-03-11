@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import argparse
 parser = argparse.ArgumentParser()
 subparsers = parser.add_subparsers(title='subcommands', description='Valid subcommands are:')
