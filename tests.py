@@ -47,8 +47,10 @@ def StartCorrectTaskTest():
      sm = StateMachine()
      sm.Start(task1)
      sm.Start(task2)
+     sm.Start(task3)
      print task1.state
      print task2.state
+     print task3.state
 
 
 def StartWrongTaskTest():
@@ -117,8 +119,8 @@ def HoldCorrectTaskTest():
      task1 = Task(1,States.INPROGRESS_ACTIVE)
      task2 =  Task(2,States.INPROGRESS_INACTIVE)
      sm = StateMachine()
-     sm.Hold(task1)
-     sm.Hold(task2)
+     sm.Hold(task1, "Oops")
+     sm.Hold(task2, "Oops")
      print task1.state,  task2.state
     
 
@@ -127,7 +129,7 @@ def HoldWrongTaskTest():
      try:    
          task = Task(1,States.DONE) 
          sm = StateMachine()
-         sm.Hold(task)
+         sm.Hold(task,  "Oops")
          print task.state
      except TransitionError as e:
         print e.msg, e.prev,  e.next
@@ -135,7 +137,7 @@ def HoldWrongTaskTest():
      try:    
          task = Task(1,States.BACKLOG) 
          sm = StateMachine()
-         sm.Hold(task)
+         sm.Hold(task,  "Oops")
          print task.state
      except TransitionError as e:
         print e.msg, e.prev,  e.next
@@ -143,7 +145,7 @@ def HoldWrongTaskTest():
      try:    
          task = Task(1,States.ONHOLD) 
          sm = StateMachine()
-         sm.Hold(task)
+         sm.Hold(task,  "Oops")
          print task.state
      except TransitionError as e:
         print e.msg, e.prev,  e.next
@@ -159,7 +161,7 @@ def DoneCorrectTaskTest():
     
 
 def DoneWrongTaskTest():
-     print "***** HoldWrongTaskTest ********"    
+     print "***** DoneWrongTaskTest ********"    
      try:    
          task = Task(1,States.DONE) 
          sm = StateMachine()
