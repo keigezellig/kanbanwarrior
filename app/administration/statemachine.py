@@ -15,97 +15,84 @@ class TransitionError(Exception):
         self.prev = prev
         self.next = next
         self.msg = msg
-        
+    
+    def __str__(self):
+        return self.msg
     
 class StateMachine:
      pathToTaskWarrior = None
     
-     def __init__(self):
-        self.pathToTaskWarrior = FindTaskWarrior();
-        if (self.pathToTaskWarrior == None):
-            raise IOException("Cannot find Task Warrior program. Please install it")
+     def __init__(self, pathToTW):
+        self.pathToTaskWarrior = pathToTW;
         
-        
-     def AddToWip(self, task):
-         if (task.state != States.BACKLOG) & (task.state != States.ONHOLD):
+     def addToWip(self, task):
+         if (task.state != States.BACKLOG) and (task.state != States.ONHOLD):
              raise TransitionError(task.state,  States.INPROGRESS_INACTIVE,  "Task must be in backlog or on hold")
          
-         self.TaskwarriorAddToWip(task)
+         self.__taskwarriorAddToWip(task)
          
-         task.state = States.INPROGRESS_INACTIVE
+         
         
-     def TaskwarriorAddToWip(self, task):
-        # Command line is:  task <taskid> +inprogress -backlog|-onhold
+     def __taskwarriorAddToWip(self, task):
+        # Command line is:  task <taskid> modify +inprogress -backlog|-onhold
         verb = "-backlog"
         
         if (task.state == States.ONHOLD):
             verb = "-onhold"
         
-        verb = "modify " + verb + " +inprogress"
-        
-        commandline = self.pathToTaskWarrior + " " +task.taskid.__str__() + " " + verb
-        print "TaskwarriorAddToWip => "+commandline
+        subprocess.check_call(['task', task.taskid.__str__(), 'modify',  '+inprogress',  verb  ])
+       
 
-     def Start(self, task):
-         if (task.state != States.BACKLOG) & (task.state != States.ONHOLD) & (task.state != States.INPROGRESS_INACTIVE):
+     def start(self, task):
+         if (task.state != States.BACKLOG) and (task.state != States.ONHOLD) and (task.state != States.INPROGRESS_INACTIVE):
              raise TransitionError(task.state,  States.INPROGRESS_ACTIVE,  "Task must be in backlog or on hold or inactive")
          
          if (task.state == States.BACKLOG) | (task.state  == States.ONHOLD) :
-            self.AddToWip(task)
+            self.addToWip(task)
          
-         self.TaskwarriorStartTask(task)
-         task.state = States.INPROGRESS_ACTIVE
+         self.__taskwarriorStartTask(task)
+         
         
-     def TaskwarriorStartTask(self, task):
+     def __taskwarriorStartTask(self, task):
          # Command line is:  task <taskid> start
-        verb = "start"
-        commandline = self.pathToTaskWarrior + " " +task.taskid.__str__() + " " + verb
-        print "TaskwarriorStartTask => "+commandline
+        subprocess.check_call(['task', task.taskid.__str__(), 'start'  ])
 
-     def Stop(self, task):
+     def stop(self, task):
          if (task.state != States.INPROGRESS_ACTIVE):
              raise TransitionError(task.state,  States.INPROGRESS_INACTIVE,  "Task must be active")
          
-         self.TaskwarriorStopTask(task)
-         task.state = States.INPROGRESS_INACTIVE
+         self.__taskwarriorStopTask(task)
+       
         
-     def TaskwarriorStopTask(self, task):
+     def __taskwarriorStopTask(self, task):
          # Command line is:  task <taskid> stop
-        verb = "stop"
-        commandline = self.pathToTaskWarrior + " " +task.taskid.__str__() + " " + verb
-        print ("TaskwarriorStopTask => "+commandline)
+       subprocess.check_call(['task',  task.taskid.__str__(), 'stop'  ])
 
-     def Hold(self, task,  reason):
-         if (task.state != States.INPROGRESS_ACTIVE) & (task.state != States.INPROGRESS_INACTIVE):
+     def hold(self, task,  reason):
+         if (task.state != States.INPROGRESS_ACTIVE) and (task.state != States.INPROGRESS_INACTIVE):
              raise TransitionError(task.state,  States.ONHOLD,  "Task must be in progress")
          
          if (task.state == States.INPROGRESS_ACTIVE):
-             self.Stop(task)
+             self.stop(task)
              
-         self.TaskwarriorHoldTask(task,  reason)
-         task.state = States.ONHOLD
+         self.__taskwarriorHoldTask(task,  reason)
         
-     def TaskwarriorHoldTask(self, task,  reason):
+        
+     def __taskwarriorHoldTask(self, task,  reason):
           # Command line is:  task <taskid> modify -inprogress +onhold 
           #                                   task <taskid> annotate <reason>
-         verb = "modify -inprogress +onhold"
-         verbAnnotate = "annotate " + reason
-         commandlineModify = self.pathToTaskWarrior + " " +task.taskid.__str__() + " " + verb
-         commandlineAnnotate = self.pathToTaskWarrior + " " +task.taskid.__str__() + " " + verbAnnotate
-         print "TaskwarriorHoldTask => " + commandlineModify + "\n " +commandlineAnnotate
+         subprocess.check_call(['task',  task.taskid.__str__(), 'modify', '+onhold',  '-inprogress'  ])
+         subprocess.check_call(['task',  task.taskid.__str__(), 'annotate',  'PUT ON HOLD: '+reason  ])
 
-     def Finish(self, task):
-         if (task.state != States.INPROGRESS_ACTIVE) & (task.state != States.INPROGRESS_INACTIVE):
+     def finish(self, task):
+         if (task.state != States.INPROGRESS_ACTIVE) and (task.state != States.INPROGRESS_INACTIVE):
              raise TransitionError(task.state,  States.INPROGRESS_INACTIVE,  "Task must be in progress")
          
-         self.TaskwarriorFinishTask(task)
-         task.state = States.DONE
+         self.__taskwarriorFinishTask(task)
+         
         
-     def TaskwarriorFinishTask(self, task):
+     def __taskwarriorFinishTask(self, task):
         # Command line is:  task <taskid> modify -inprogress  
           #                               task <taskid> done
-         verb = "modify -inprogress"
-         verbDone = "done"
-         commandlineModify = self.pathToTaskWarrior + " " +task.taskid.__str__() + " " + verb
-         commandlineDone = self.pathToTaskWarrior + " " +task.taskid.__str__() + " " + verbDone
-         print "TaskwarriorFinishTask => " + commandlineModify + "\n " +commandlineDone
+         subprocess.check_call(['task',  task.taskid.__str__(), 'modify', '-inprogress'  ])
+         subprocess.check_call(['task',  task.taskid.__str__(),'done'  ])

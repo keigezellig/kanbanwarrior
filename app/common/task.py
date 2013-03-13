@@ -1,4 +1,4 @@
-from app.common.taskwarrior import *
+
 import json
 import subprocess
 
@@ -19,12 +19,22 @@ class Task:
         self.state = state
 
 class Tasklist:
-       def __init__(self):
-           self.pathToTaskWarrior = FindTaskWarrior();
+       __list = []
+       
+       def __init__(self,  pathToTW):
+           self.pathToTaskWarrior = pathToTW;
            if (self.pathToTaskWarrior == None):
                raise IOException("Cannot find Task Warrior program. Please install it")
+           self.__list = self.__getTaskList()
            
 
+       def getTaskById(self, id):           
+           taskfilter = filter(lambda x: x.taskid == id, self.__list)
+           if taskfilter == []:
+               raise LookupError('Unknown task specified.')
+           else:
+               return taskfilter[0]
+       
        def __mapToTask(self, taskitem):
             if ('tags' in taskitem) and (len(taskitem['tags']) == 1) and ('backlog' in taskitem['tags']): 
                 return Task(taskitem['id'], States.BACKLOG)
@@ -43,7 +53,7 @@ class Tasklist:
             return listitem != None and listitem.taskid != 0
     
 
-       def getTaskList(self):
+       def __getTaskList(self):
         # excecute and get output from task export command
         exportOutput = subprocess.check_output([self.pathToTaskWarrior,'export']) 
         

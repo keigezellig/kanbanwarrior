@@ -7,7 +7,8 @@ a = Tasklist()
 b = a.getTaskList()
 
 c = [x for x in b if x.taskid == 1] 
-d = filter(lambda x: x.taskid == 5, b)
-
-print d[0].taskid
-
+d = filter(lambda x: x.taskid == 55, b)
+if c == []:
+    print "leeg"
+else:
+    print c[0].taskid
