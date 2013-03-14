@@ -1,6 +1,8 @@
 from app.common.task import *
 from app.common.taskwarrior import *
 
+__version__ = '0.1'
+
 class TransitionError(Exception):
     """Raised when an operation attempts a state transition that's not
     allowed.

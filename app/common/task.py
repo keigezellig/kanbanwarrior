@@ -2,6 +2,8 @@
 import json
 import subprocess
 
+__version__ = '0.1'
+
 class States:
     NONE = 0
     BACKLOG = 1

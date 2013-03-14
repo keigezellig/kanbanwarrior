@@ -9,6 +9,8 @@ import subprocess
 
 import sys
 
+__version__ = '0.1'
+
 if __name__=="__main__":   
     
     try:
@@ -22,6 +24,7 @@ if __name__=="__main__":
             subprocess.check_call(['task', 'add', args.taskname,  'project:'+args.projectname,  'priority:'+args.priority,  '+backlog'  ])
             sys.exit(0)
         
+      
         if args.command != 'list':
             print "Loading task list.."
             tasklist = Tasklist(pathToTW)
@@ -41,6 +44,9 @@ if __name__=="__main__":
             elif args.command == 'hold':
                 sm.hold(task, args.reason)
             sys.exit(0)
+        else:
+            print "Sorry, not implemented yet"
+        
        
         
     except (IOError,  LookupError,  TransitionError) as e:

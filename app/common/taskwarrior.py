@@ -1,5 +1,7 @@
 import os
 
+__version__ = '0.1'
+
 def findTaskWarrior():
      #Default path for now, maybe in the future configurable
      filename='task'
