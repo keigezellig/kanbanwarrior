@@ -1,4 +1,17 @@
+#/*
+# * -----------------------------------------------------------------------------------------------
+# * "THE APPRECIATION LICENSE" (Revision 0xFF):
+# * Copyright (c) 2013 M. Joosten
+# * You can do anything with this program and its code, even use it to run a nuclear reactor (why should you)
+#   But I won't be responsible for possible damage and mishap, because i never tested it on a nuclear reactor (why should I..)  
+#   If you think this program/code is absolutely great and supercalifragilisticexpialidocious (or just plain useful), just
+#   let me know by sending me a nice email or postcard from your country of origin and leave this header in the code
+#   See my blog (http://keigezellig.blog.com), for contact info
+# * ---------------------------------------------------------------------------------------------------
+# */
+ 
 import argparse
+__version__ = '1.0'
 
 def constructArgParser():
     parser = argparse.ArgumentParser()
@@ -10,7 +23,7 @@ def constructArgParser():
     stop_parser = subparsers.add_parser('stop', help='Stops a task from the in progress queue')
     finish_parser = subparsers.add_parser('finish', help='Finishes a task')
     hold_parser = subparsers.add_parser('hold', help='Puts a task on hold')
-
+    
     report_parser = subparsers.add_parser('list', help='Reports')
     reportsubparsers = report_parser.add_subparsers(title='report types',  description='Valid reports are:',  dest='report' )
     backlog_reportparser = reportsubparsers.add_parser('backlog',  help='Displays the contents of the backlog')
@@ -18,6 +31,7 @@ def constructArgParser():
     done_reportparser = reportsubparsers.add_parser('done',  help='Displays finished tasks')
     onhold_reportparser = reportsubparsers.add_parser('onhold',  help='Displays tasks on hold')
 
+   
     addtobacklog_parser.add_argument('projectname',  help='The name of project for which the task is added. May be in the form project.subproject')
     addtobacklog_parser.add_argument('taskname', help='Task description')
     addtobacklog_parser.add_argument('--priority', choices=['H', 'M', 'L', ''], default='',  help='Optional task priority. H=High, M=Medium, L=Low. When not specified,  no priority is assigned')

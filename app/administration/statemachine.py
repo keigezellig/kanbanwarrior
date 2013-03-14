@@ -1,6 +1,8 @@
 from app.common.task import *
 from app.common.taskwarrior import *
 
+__version__ = '1.0'
+
 class TransitionError(Exception):
     """Raised when an operation attempts a state transition that's not
     allowed.
@@ -40,7 +42,7 @@ class StateMachine:
         if (task.state == States.ONHOLD):
             verb = "-onhold"
         
-        subprocess.check_call(['task', task.taskid.__str__(), 'modify',  '+inprogress',  verb  ])
+        subprocess.call([self.pathToTaskWarrior, task.taskid.__str__(), 'modify',  '+inprogress',  verb  ])
        
 
      def start(self, task):
@@ -55,7 +57,7 @@ class StateMachine:
         
      def __taskwarriorStartTask(self, task):
          # Command line is:  task <taskid> start
-        subprocess.check_call(['task', task.taskid.__str__(), 'start'  ])
+        subprocess.call([self.pathToTaskWarrior, task.taskid.__str__(), 'start'  ])
 
      def stop(self, task):
          if (task.state != States.INPROGRESS_ACTIVE):
@@ -66,7 +68,7 @@ class StateMachine:
         
      def __taskwarriorStopTask(self, task):
          # Command line is:  task <taskid> stop
-       subprocess.check_call(['task',  task.taskid.__str__(), 'stop'  ])
+       subprocess.call([self.pathToTaskWarrior,  task.taskid.__str__(), 'stop'  ])
 
      def hold(self, task,  reason):
          if (task.state != States.INPROGRESS_ACTIVE) and (task.state != States.INPROGRESS_INACTIVE):
@@ -81,8 +83,8 @@ class StateMachine:
      def __taskwarriorHoldTask(self, task,  reason):
           # Command line is:  task <taskid> modify -inprogress +onhold 
           #                                   task <taskid> annotate <reason>
-         subprocess.check_call(['task',  task.taskid.__str__(), 'modify', '+onhold',  '-inprogress'  ])
-         subprocess.check_call(['task',  task.taskid.__str__(), 'annotate',  'PUT ON HOLD: '+reason  ])
+         subprocess.call([self.pathToTaskWarrior,  task.taskid.__str__(), 'modify', '+onhold',  '-inprogress'  ])
+         subprocess.call([self.pathToTaskWarrior,  task.taskid.__str__(), 'annotate',  'PUT ON HOLD: '+reason  ])
 
      def finish(self, task):
          if (task.state != States.INPROGRESS_ACTIVE) and (task.state != States.INPROGRESS_INACTIVE):
@@ -94,5 +96,5 @@ class StateMachine:
      def __taskwarriorFinishTask(self, task):
         # Command line is:  task <taskid> modify -inprogress  
           #                               task <taskid> done
-         subprocess.check_call(['task',  task.taskid.__str__(), 'modify', '-inprogress'  ])
-         subprocess.check_call(['task',  task.taskid.__str__(),'done'  ])
+         subprocess.call([self.pathToTaskWarrior,  task.taskid.__str__(), 'modify', '-inprogress'  ])
+         subprocess.call([self.pathToTaskWarrior,  task.taskid.__str__(),'done'  ])
