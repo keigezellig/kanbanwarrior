@@ -1,5 +1,17 @@
 #!/usr/bin/env python
 
+#/*
+# * -----------------------------------------------------------------------------------------------
+# * "THE APPRECIATION LICENSE" (Revision 0xFF):
+# * Copyright (c) 2013 M. Joosten
+# * You can do anything with this program and its code, even use it to run a nuclear reactor (why should you)
+#   But I won't be responsible for possible damage and mishap, because i never tested it on a nuclear reactor (why should I..)  
+#   If you think this program/code is absolutely great and supercalifragilisticexpialidocious (or just plain useful), just
+#   let me know by sending me a nice email or postcard from your country of origin and leave this header in the code
+#   See my blog (http://keigezellig.blog.com), for contact info
+# * ---------------------------------------------------------------------------------------------------
+# */
+
 from app.administration.statemachine import *
 from app.common.task import *
 from app.common.taskwarrior import *
@@ -9,7 +21,7 @@ import subprocess
 
 import sys
 
-__version__ = '0.1'
+__version__ = '1.0'
 
 if __name__=="__main__":   
     
@@ -17,18 +29,18 @@ if __name__=="__main__":
         argParser = constructArgParser() 
         args = argParser.parse_args()
         
-        pathToTW =  findTaskWarrior()
+        pathToTaskWarrior =  findTaskWarrior()
        
         
         if args.command=='addtobacklog':
-            subprocess.check_call(['task', 'add', args.taskname,  'project:'+args.projectname,  'priority:'+args.priority,  '+backlog'  ])
+            subprocess.check_call([pathToTaskWarrior, 'add', args.taskname,  'project:'+args.projectname,  'priority:'+args.priority,  '+backlog'  ])
             sys.exit(0)
         
       
         if args.command != 'list':
             print "Loading task list.."
-            tasklist = Tasklist(pathToTW)
-            sm = StateMachine(pathToTW)
+            tasklist = Tasklist(pathToTaskWarrior)
+            sm = StateMachine(pathToTaskWarrior)
             task = tasklist.getTaskById(args.taskid)
             if task == None:
                 sys.exit('Unknown task specified. Aborting program')
@@ -43,9 +55,20 @@ if __name__=="__main__":
                 sm.finish(task)
             elif args.command == 'hold':
                 sm.hold(task, args.reason)
-            sys.exit(0)
+            
         else:
-            print "Sorry, not implemented yet"
+            if args.report == 'backlog':
+                subprocess.call([pathToTaskWarrior, 'long' , 'project:'+args.projectname,  '+backlog'  ])
+            elif args.report == 'wip':
+                subprocess.call([pathToTaskWarrior, 'long' ,  'project:'+args.projectname,  '+inprogress'  ])
+            elif args.report == 'done':
+                subprocess.call([pathToTaskWarrior, 'completed' ])
+            elif args.report == 'onhold':
+                subprocess.call([pathToTaskWarrior, 'long' , 'project:'+args.projectname,  '+onhold'  ])
+                
+                
+            
+            
         
        
         

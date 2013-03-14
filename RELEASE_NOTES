@@ -1,0 +1,6 @@
+v1.0
+----
+- It's possible to administer tasks and projects.
+- Assigning a priority with the addbacklog command doesn't work yet
+- Only works under Linux/Unix
+- Path to the TaskWarrior binary is hardcoded in the application to /usr/bin/
