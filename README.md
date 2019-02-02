@@ -2,11 +2,11 @@ kanbanwarrior
 =============
 
 A python script supporting my kanban workflow for Task Warrior.
-For more info about the workflow itself see http://keigezellig.blog.com/2013/03/07/kanban-warrior/
+For more info about the workflow itself see http://blog.joosten-industries.nl/2013/03/07/kanban-warrior/
 
 Installation
 ------------
-- Make sure Python 2.7.3 or higher is installed. (see http://wiki.python.org/moin/BeginnersGuide/Download)
+- Make sure Python 2.7.x is installed. (see http://wiki.python.org/moin/BeginnersGuide/Download)
 - Make sure Taskwarrior 2.1.2 or higher is installed. (see http://taskwarrior.org/projects/taskwarrior/wiki/Download)
 - Download the scripts by cloning this repository (if you have a git client) or click the link above to download it as an archive.
 - Unzip or copy the downloaded files to a directory of your choice (preferably on your path)
