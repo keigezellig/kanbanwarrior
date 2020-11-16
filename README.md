@@ -29,18 +29,18 @@ Short usage summary
 
 Commands
 --------
-- Add task to backlog: <b>kanban-warrior addtobacklog [projectname.storyname] [taskdescription] [priority]</b>
-- Add task to In Progress: <b>kanban-warrior addtowip [taskid]</b>
-- Start task: kanban-warrior <b>start [taskid]</b>
-- Stop task: kanban-warrior <b>stop [taskid]</b>
-- Set task on hold: <b>kanban-warrior hold [taskid] [reason]</b>
-- Finish a task: <b>kanban-warrior finish [taskid]</b>
+- Add task to backlog: **kanban-warrior addtobacklog [projectname.storyname] [taskdescription] [priority]**
+- Add task to In Progress: **kanban-warrior addtowip [taskid]**
+- Start task: **kanban-warrior start [taskid]**
+- Stop task: **kanban-warrior stop [taskid]**
+- Set task on hold: **kanban-warrior hold [taskid] [reason]**
+- Finish a task: **kanban-warrior finish [taskid]**
 
 Reports
 --------
-- List backlog</b>: <b>kanban-warrior list backlog [projectname]</b> 
-- List work in progress</b>: <b>kanban-warriot list wip [projectname]</b>
-- List finished work</b>: <b>kanban-warrior list done [projectname]</b> 
-- List work in progress</b>: <b>kanban-warrior list onhold [projectname]</b> 
+- List backlog: **kanban-warrior list backlog [projectname]**
+- List work in progress: **kanban-warriot list wip [projectname]**
+- List finished work: **kanban-warrior list done [projectname]**
+- List work in progress: **kanban-warrior list onhold [projectname]**
 
 
