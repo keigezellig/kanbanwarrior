@@ -12,24 +12,24 @@
 # * ---------------------------------------------------------------------------------------------------
 # */
 
-from app.administration.statemachine import *
-from app.common.task import *
-from app.common.taskwarrior import *
-from app.common.command import *
-
-import subprocess
-
 import sys
+import subprocess
+from app.administration.statemachine import StateMachine, TransitionError
+
+from app.common.command import construct_argparser
+from app.common.task import Tasklist
+from app.common.taskwarrior import find_tw
+
 
 __version__ = '1.0'
 
 if __name__=="__main__":   
     
     try:
-        argParser = constructArgParser() 
+        argParser = construct_argparser() 
         args = argParser.parse_args()
         
-        pathToTaskWarrior =  findTaskWarrior()
+        pathToTaskWarrior =  find_tw()
        
         
         if args.command=='addtobacklog':
@@ -38,15 +38,15 @@ if __name__=="__main__":
         
       
         if args.command != 'list':
-            print "Loading task list.."
+            print("Loading task list..")
             tasklist = Tasklist(pathToTaskWarrior)
             sm = StateMachine(pathToTaskWarrior)
-            task = tasklist.getTaskById(args.taskid)
-            if task == None:
+            task = tasklist.get_task_by_id(args.taskid)
+            if task is None:
                 sys.exit('Unknown task specified. Aborting program')
             
             if args.command == 'addtowip':
-                sm.addToWip(task)
+                sm.add_to_wip(task)
             elif args.command == 'start':
                 sm.start(task)
             elif args.command == 'stop':

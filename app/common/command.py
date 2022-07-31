@@ -13,7 +13,7 @@
 import argparse
 __version__ = '1.0'
 
-def constructArgParser():
+def construct_argparser():
     parser = argparse.ArgumentParser()
     
     subparsers = parser.add_subparsers(title='subcommands', description='Valid subcommands are:',  dest="command")

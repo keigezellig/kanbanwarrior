@@ -34,20 +34,20 @@ class Tasklist:
        __list = []
        
        def __init__(self,  pathToTW):
-           self.pathToTaskWarrior = pathToTW;
-           if (self.pathToTaskWarrior == None):
-               raise IOException("Cannot find Task Warrior program. Please install it")
-           self.__list = self.__getTaskList()
+           self.path_to_tw = pathToTW;
+           if (self.path_to_tw is None):
+               raise IOError("Cannot find Task Warrior program. Please install it")
+           self.__list = self._get_task_list()
            
 
-       def getTaskById(self, id):           
-           taskfilter = filter(lambda x: x.taskid == id, self.__list)
-           if taskfilter == []:
+       def get_task_by_id(self, task_id):           
+           taskfilter = filter(lambda x: x.taskid == task_id, self.__list)
+           if not taskfilter:
                raise LookupError('Unknown task specified.')
            else:
-               return taskfilter[0]
+               return list(taskfilter)[0]
        
-       def __mapToTask(self, taskitem):
+       def _map_to_task(self, taskitem):
             if ('tags' in taskitem) and (len(taskitem['tags']) == 1) and ('backlog' in taskitem['tags']): 
                 return Task(taskitem['id'], States.BACKLOG)
                
@@ -61,25 +61,26 @@ class Tasklist:
                 return Task(taskitem['id'], States.ONHOLD)
      
 
-       def __filterIllegalTasks(self,  listitem):
-            return listitem != None and listitem.taskid != 0
+       def _filter_illegal_tasks(self,  listitem):
+            return listitem is not None and listitem.taskid != 0
     
 
-       def __getTaskList(self):
+       def _get_task_list(self):
         # excecute and get output from task export command
-        exportOutput = subprocess.check_output([self.pathToTaskWarrior,'export']) 
+        export_output = subprocess.check_output([self.path_to_tw,'export']).decode() 
+        print(export_output)
         
-        # strip funky header (goes until first \n)
-        jsonstring = exportOutput[exportOutput.index('\n')+1:] 
-        # add array brackets for json deserialization
-        jsonstring = '[' + jsonstring
-        jsonstring = jsonstring + ']' 
+        # # strip funky header (goes until first \n)
+        # jsonstring = export_output[export_output.index('\n')+1:] 
+        # # add array brackets for json deserialization
+        # jsonstring = '[' + jsonstring
+        # jsonstring = jsonstring + ']' 
         
-        tasklist = json.loads(jsonstring)
+        tasklist = json.loads(export_output)
 
         # map it to a list of task objects
-        tasklist = map(self.__mapToTask, tasklist)
+        tasklist = map(self._map_to_task, tasklist)
         # filter out the illegal ones
-        tasklist = filter(self.__filterIllegalTasks, tasklist)
+        tasklist = filter(self._filter_illegal_tasks, tasklist)
         
         return tasklist

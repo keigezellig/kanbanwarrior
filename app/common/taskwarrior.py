@@ -14,7 +14,7 @@ import os
 
 __version__ = '1.0'
 
-def findTaskWarrior():
+def find_tw():
      #Default path for now, maybe in the future configurable
      filename='task'
      path='/usr/bin'
