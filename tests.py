@@ -2,15 +2,19 @@
 
 
 
-from app.administration.statemachine import StateMachine, TransitionError
-from app.common.task import States, Task
 
-path_to_tw = '/bin/task'
+from app.statemachine import StateMachine, TransitionError
+from app.task import States, Task
+from app.taskwarrior import TaskWarrior
+
+
+tw = TaskWarrior()
+
 def AddCorrectTaskToWipTest():
      print("***** AddCorrectTaskToWipTest ********")
      task1 = Task(1,States.BACKLOG) 
      task2 = Task(1,States.ONHOLD)
-     sm = StateMachine(path_to_tw)
+     sm = StateMachine(tw)
      sm.add_to_wip(task1)
      sm.add_to_wip(task2)
      print (task1.state)
@@ -21,7 +25,7 @@ def AddWrongTaskToWipTest():
      print("***** AddWrongTaskToWipTest ********")
      try:
          task = Task(1,States.INPROGRESS_INACTIVE) 
-         sm = StateMachine(path_to_tw)
+         sm = StateMachine(tw)
          sm.add_to_wip(task)
          print (task.state)
      except TransitionError as e:
@@ -29,7 +33,7 @@ def AddWrongTaskToWipTest():
       
      try: 
          task = Task(1,States.INPROGRESS_ACTIVE) 
-         sm = StateMachine(path_to_tw)
+         sm = StateMachine(tw)
          sm.add_to_wip(task)
          print (task.state)
      except TransitionError as e:
@@ -37,7 +41,7 @@ def AddWrongTaskToWipTest():
      
      try:    
          task = Task(1,States.DONE) 
-         sm = StateMachine(path_to_tw)
+         sm = StateMachine(tw)
          sm.add_to_wip(task)
          print (task.state)
      except TransitionError as e:
@@ -48,7 +52,7 @@ def StartCorrectTaskTest():
      task1 = Task(1,States.BACKLOG) 
      task2 = Task(1,States.ONHOLD)
      task3 = Task(1,States.INPROGRESS_INACTIVE)
-     sm = StateMachine(path_to_tw)
+     sm = StateMachine(tw)
      sm.start(task1)
      sm.start(task2)
      sm.start(task3)
@@ -61,7 +65,7 @@ def StartWrongTaskTest():
      print ("***** StartWrongTaskTest ********"    )
      try: 
          task = Task(1,States.INPROGRESS_ACTIVE) 
-         sm = StateMachine(path_to_tw)
+         sm = StateMachine(tw)
          sm.start(task)
          print (task.state)
      except TransitionError as e:
@@ -69,7 +73,7 @@ def StartWrongTaskTest():
      
      try:    
          task = Task(1,States.DONE) 
-         sm = StateMachine(path_to_tw)
+         sm = StateMachine(tw)
          sm.start(task)
          print (task.state)
      except TransitionError as e:
@@ -78,7 +82,7 @@ def StartWrongTaskTest():
 def StopCorrectTaskTest():
      print ("***** StopCorrectTaskTest ********")
      task1 = Task(1,States.INPROGRESS_ACTIVE) 
-     sm = StateMachine(path_to_tw)
+     sm = StateMachine(tw)
      sm.stop(task1)
      print (task1.state)
     
@@ -87,7 +91,7 @@ def StopWrongTaskTest():
      print ("***** StopWrongTaskTest ********")    
      try: 
          task = Task(1,States.INPROGRESS_INACTIVE) 
-         sm = StateMachine(path_to_tw)
+         sm = StateMachine(tw)
          sm.stop(task)
          print (task.state)
      except TransitionError as e:
@@ -95,7 +99,7 @@ def StopWrongTaskTest():
      
      try:    
          task = Task(1,States.DONE) 
-         sm = StateMachine(path_to_tw)
+         sm = StateMachine(tw)
          sm.stop(task)
          print (task.state)
      except TransitionError as e:
@@ -103,7 +107,7 @@ def StopWrongTaskTest():
 
      try:    
          task = Task(1,States.BACKLOG) 
-         sm = StateMachine(path_to_tw)
+         sm = StateMachine(tw)
          sm.stop(task)
          print (task.state)
      except TransitionError as e:
@@ -111,7 +115,7 @@ def StopWrongTaskTest():
 
      try:    
          task = Task(1,States.ONHOLD) 
-         sm = StateMachine(path_to_tw)
+         sm = StateMachine(tw)
          sm.stop(task)
          print (task.state)
      except TransitionError as e:
@@ -122,7 +126,7 @@ def HoldCorrectTaskTest():
      print ("***** HoldCorrectTaskTest ********")
      task1 = Task(1,States.INPROGRESS_ACTIVE)
      task2 =  Task(2,States.INPROGRESS_INACTIVE)
-     sm = StateMachine(path_to_tw)
+     sm = StateMachine(tw)
      sm.hold(task1, "Oops")
      sm.hold(task2, "Oops")
      print (task1.state,  task2.state)
@@ -132,7 +136,7 @@ def HoldWrongTaskTest():
      print ("***** HoldWrongTaskTest ********"    )
      try:    
          task = Task(1,States.DONE) 
-         sm = StateMachine(path_to_tw)
+         sm = StateMachine(tw)
          sm.hold(task,  "Oops")
          print (task.state)
      except TransitionError as e:
@@ -140,7 +144,7 @@ def HoldWrongTaskTest():
 
      try:    
          task = Task(1,States.BACKLOG) 
-         sm = StateMachine(path_to_tw)
+         sm = StateMachine(tw)
          sm.hold(task,  "Oops")
          print (task.state)
      except TransitionError as e:
@@ -148,7 +152,7 @@ def HoldWrongTaskTest():
 
      try:    
          task = Task(1,States.ONHOLD) 
-         sm = StateMachine(path_to_tw)
+         sm = StateMachine(tw)
          sm.hold(task,  "Oops")
          print (task.state)
      except TransitionError as e:
@@ -158,7 +162,7 @@ def DoneCorrectTaskTest():
      print ("***** DoneCorrectTaskTest ********")
      task1 = Task(1,States.INPROGRESS_ACTIVE)
      task2 =  Task(2,States.INPROGRESS_INACTIVE)
-     sm = StateMachine(path_to_tw)
+     sm = StateMachine(tw)
      sm.finish(task1)
      sm.finish(task2)
      print (task1.state,  task2.state)
@@ -168,7 +172,7 @@ def DoneWrongTaskTest():
      print ("***** DoneWrongTaskTest ********"    )
      try:    
          task = Task(1,States.DONE) 
-         sm = StateMachine(path_to_tw)
+         sm = StateMachine(tw)
          sm.finish(task)
          print (task.state)
      except TransitionError as e:
@@ -176,7 +180,7 @@ def DoneWrongTaskTest():
 
      try:    
          task = Task(1,States.BACKLOG) 
-         sm = StateMachine(path_to_tw)
+         sm = StateMachine(tw)
          sm.finish(task)
          print (task.state)
      except TransitionError as e:
@@ -184,7 +188,7 @@ def DoneWrongTaskTest():
 
      try:    
          task = Task(1,States.ONHOLD) 
-         sm = StateMachine(path_to_tw)
+         sm = StateMachine(tw)
          sm.finish(task)
          print (task.state)
      except TransitionError as e:

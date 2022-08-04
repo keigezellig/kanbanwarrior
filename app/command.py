@@ -46,6 +46,7 @@ def construct_argparser():
     wip_reportparser.add_argument('projectname',  help='The project for which the report is generated. May be in the form project.subproject')
     done_reportparser.add_argument('projectname',  help='The project for which the report is generated. May be in the form project.subproject')
     onhold_reportparser.add_argument('projectname',  help='The project for which the report is generated. May be in the form project.subproject')
+    subparsers.required = True
 
     return parser
     

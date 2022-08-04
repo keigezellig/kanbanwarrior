@@ -12,6 +12,9 @@
 import json
 import subprocess
 
+from app.taskwarrior import TaskWarrior
+from typing import List
+
 __version__ = '1.0'
 
 class States:
@@ -30,22 +33,18 @@ class Task:
         self.taskid = taskid
         self.state = state
 
-class Tasklist:
-       __list = []
+class Tasklist:       
        
-       def __init__(self,  pathToTW):
-           self.path_to_tw = pathToTW;
-           if (self.path_to_tw is None):
-               raise IOError("Cannot find Task Warrior program. Please install it")
-           self.__list = self._get_task_list()
+       def __init__(self,  task_warrior: TaskWarrior):
+           self._list = self._get_task_list(task_warrior)
            
 
        def get_task_by_id(self, task_id):           
-           taskfilter = filter(lambda x: x.taskid == task_id, self.__list)
-           if not taskfilter:
+           task_to_be_found = [task for task in self._list if task.taskid==task_id]
+           if not task_to_be_found:
                raise LookupError('Unknown task specified.')
            else:
-               return list(taskfilter)[0]
+               return task_to_be_found[0]
        
        def _map_to_task(self, taskitem):
             if ('tags' in taskitem) and (len(taskitem['tags']) == 1) and ('backlog' in taskitem['tags']): 
@@ -61,26 +60,14 @@ class Tasklist:
                 return Task(taskitem['id'], States.ONHOLD)
      
 
-       def _filter_illegal_tasks(self,  listitem):
-            return listitem is not None and listitem.taskid != 0
+       def _is_valid_task(self,  listitem):
+            return listitem is not None and listitem['id'] != 0
     
 
-       def _get_task_list(self):
-        # excecute and get output from task export command
-        export_output = subprocess.check_output([self.path_to_tw,'export']).decode() 
-        print(export_output)
+       def _get_task_list(self, task_warrior: TaskWarrior) -> List[Task]:
         
-        # # strip funky header (goes until first \n)
-        # jsonstring = export_output[export_output.index('\n')+1:] 
-        # # add array brackets for json deserialization
-        # jsonstring = '[' + jsonstring
-        # jsonstring = jsonstring + ']' 
-        
-        tasklist = json.loads(export_output)
-
-        # map it to a list of task objects
-        tasklist = map(self._map_to_task, tasklist)
-        # filter out the illegal ones
-        tasklist = filter(self._filter_illegal_tasks, tasklist)
-        
+        raw_list = task_warrior.get_task_list()
+    
+        # map it to a list of task objects and filter out the illegal ones
+        tasklist: List[Task] = [self._map_to_task(item) for item in raw_list if self._is_valid_task(item)]  
         return tasklist
